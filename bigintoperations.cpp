@@ -133,8 +133,6 @@ public:
 int main() {
     B_Int a("10000000000000000000");
     B_Int b("5000000000000000000");
-
-    B_Int zbir = a + b;
     B_Int razlika = a - b;
     B_Int proizvod = a * b;
     B_Int kolicnik = a / b;
