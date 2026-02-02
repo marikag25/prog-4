@@ -6,6 +6,7 @@ public:
     string val;
 
     BigInt(string s = "0") {
+        if (s.empty()) s = "0";
         val = s;
     }
 
@@ -24,16 +25,8 @@ public:
         string res = "";
         int i = val.length() - 1, j = other.val.length() - 1, ostatok = 0;
         while (i >= 0 || j >= 0 || ostatok) {
-            int v1 = 0;
-            if (i >= 0) {
-                v1 = val[i] - '0';
-                i--;
-            }
-            int v2 = 0;
-            if (j >= 0) {
-                v2 = other.val[j] - '0';
-                j--;
-            }
+            int v1 = (i >= 0) ? val[i--] - '0' : 0;
+            int v2 = (j >= 0) ? other.val[j--] - '0' : 0;
             int sum = ostatok + v1 + v2;
             res += (char)((sum % 10) + '0');
             ostatok = sum / 10;
@@ -46,13 +39,8 @@ public:
         string res = "";
         int i = val.length() - 1, j = other.val.length() - 1, zimaj = 0;
         while (i >= 0) {
-            int v1 = val[i] - '0';
-            i--;
-            int v2 = 0;
-            if (j >= 0) {
-                v2 = other.val[j] - '0';
-                j--;
-            }
+            int v1 = val[i--] - '0';
+            int v2 = (j >= 0) ? other.val[j--] - '0' : 0;
             int sub = v1 - v2 - zimaj;
             if (sub < 0) {
                 sub += 10;
@@ -83,8 +71,7 @@ public:
             if (s.empty() && x == 0) continue;
             s += (char)(x + '0');
         }
-        if (s.empty()) return BigInt("0");
-        return BigInt(s);
+        return s.empty() ? BigInt("0") : BigInt(s);
     }
 
     pair<BigInt, BigInt> divmod(BigInt other) {
@@ -97,28 +84,28 @@ public:
             int count = 0;
             while (!(current.isLess(other))) {
                 current = current - other;
-                if (current.val == "0") {
-                    currentStr = "";
-                } else {
-                    currentStr = current.val;
-                }
+                currentStr = current.val;
                 count++;
             }
             res += (char)(count + '0');
         }
-        size_t first = res.find_first_not_of('0');
+        
+        int first = -1;
+        for (int i = 0; i < (int)res.length(); i++) {
+            if (res[i] != '0') {
+                first = i;
+                break;
+            }
+        }
+
         string q;
-        if (first == string::npos) {
+        if (first == -1) {
             q = "0";
         } else {
             q = res.substr(first);
         }
-        string r;
-        if (currentStr.empty()) {
-            r = "0";
-        } else {
-            r = currentStr;
-        }
+
+        string r = currentStr.empty() ? "0" : currentStr;
         return {BigInt(q), BigInt(r)};
     }
 
@@ -130,12 +117,12 @@ BigInt binpow(BigInt a, BigInt e, BigInt m) {
     BigInt res("1");
     a = a % m;
     while (!(e == BigInt("0"))) {
-        BigInt rem = e % BigInt("2");
-        if (!(rem == BigInt("0"))) {
+        pair<BigInt, BigInt> dm = e.divmod(BigInt("2"));
+        if (!(dm.second == BigInt("0"))) {
             res = (res * a) % m;
         }
         a = (a * a) % m;
-        e = e / BigInt("2");
+        e = dm.first;
     }
     return res;
 }
